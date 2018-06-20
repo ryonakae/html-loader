@@ -52,6 +52,9 @@ module.exports = function(content) {
 	var data = {};
 	content = [content];
 	links.forEach(function(link) {
+		// Cancel processing of assets matching the ignore option
+		if (config.ignore !== undefined && link.value.match(config.ignore)) return;
+
 		if(!loaderUtils.isUrlRequest(link.value, root)) return;
 
 		if (link.value.indexOf('mailto:') > -1 ) return;
@@ -147,7 +150,7 @@ module.exports = function(content) {
 
  	return exportsString + content.replace(/xxxHTMLLINKxxx[0-9\.]+xxx/g, function(match) {
 		if(!data[match]) return match;
-		
+
 		var urlToRequest;
 
 		if (config.interpolate === 'require') {
@@ -155,7 +158,7 @@ module.exports = function(content) {
 		} else {
 			urlToRequest = loaderUtils.urlToRequest(data[match], root);
 		}
-		
+
 		return '" + require(' + JSON.stringify(urlToRequest) + ') + "';
 	}) + ";";
 
